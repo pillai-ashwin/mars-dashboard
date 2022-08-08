@@ -42,8 +42,8 @@ const generateHTML = (roverInfo, roverImages,generateInfo,generateImage) => {
 }
 
 const fetchData= async (store,currentTab)=>{
-    await getRoverData(store,currentTab);
-    await getRoverImages(store,currentTab);
+    await getRoverData(store,currentTab, (roverInfo) => updateStore(store, { roverInfo: roverInfo }));
+    await getRoverImages(store,currentTab, (roverImages) => updateStore(store, { roverImages: roverImages }));
 }
 
 // listening for load event because page should load before any JS is called
@@ -125,7 +125,7 @@ const renderImages = (images) => {
 
 // ------------------------------------------------------  API CALLS
 
-const getRoverData = (store,roverName) => {
+const getRoverData = (store,roverName,callback) => {
     fetch(`http://localhost:3000/roverInfo`,{
         method: 'POST',
         headers: {
@@ -134,10 +134,10 @@ const getRoverData = (store,roverName) => {
         body: JSON.stringify({roverName:roverName})
     })
         .then(res => res.json())
-        .then(roverInfo => updateStore(store, { roverInfo: roverInfo }))
+        .then(roverInfo => callback(roverInfo));
 }
 
-const getRoverImages = (store,roverName) => {
+const getRoverImages = (store,roverName,callback) => {
     fetch(`http://localhost:3000/fetchImage`,{
         method: 'POST',
         headers: {
@@ -146,5 +146,5 @@ const getRoverImages = (store,roverName) => {
         body: JSON.stringify({roverName:roverName})
     })
         .then(res => res.json())
-        .then(roverImages => updateStore(store, { roverImages: roverImages }))
+        .then(roverImages => callback(roverImages));
 }
